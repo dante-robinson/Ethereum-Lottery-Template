@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 pragma abicoder v2;
 
@@ -27,19 +28,20 @@ contract Lottery is VRFConsumerBase {
     //Chainlink VRF Variables
     bytes32 internal keyHash;
     uint256 internal linkFee;
-    uint256 public randomResult;
-    address internal vrfCoordinator = 0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9;
+    uint256 internal randomResult;
 
     //General use case variables
     uint256 public costPerLine;
-    uint256[7] public winningNumbers;
+    mapping(uint256 => uint256[7]) public winningNumbers;
     uint256 public totalPrizePool;
+    uint8 public correctNumbers;
+    uint256 public dividedPool;
+    uint256 public drawNumber;
 
     //Stores the address of the Prize pool
     address payable public poolOwner;
-    mapping(address => bool) internal isAddressEntered;
-    mapping(address => uint8[7]) public pickedNumbers;
-    mapping(address => uint8) internal correctNumbers;
+    mapping(uint256 => mapping(address => bool)) public isAddressEntered;
+    mapping(uint256 => mapping(address => uint8[7])) public pickedNumbers;
 
     //Winning Addresses Array
     address payable[] public sevenCorrect;
@@ -57,17 +59,21 @@ contract Lottery is VRFConsumerBase {
 
     constructor(
         uint256 _costPerLine,
+        address _vrfCoordinator,
         bytes32 _keyHash,
         uint256 _linkFee
     )
         public
         VRFConsumerBase(
-            vrfCoordinator, // VRF Coordinator address
+            _vrfCoordinator, // VRF Coordinator address
             LINKAddress // LINK Token address
         )
     {
         poolOwner = payable(msg.sender);
         costPerLine = _costPerLine;
+
+        // Start draw Number at 1
+        drawNumber = 1;
 
         //Kovan keyHash
         keyHash = _keyHash;
@@ -80,64 +86,45 @@ contract Lottery is VRFConsumerBase {
         _;
     }
 
-    //Gets the estimated amount of ETH needed to buy X amount of LINK
-    function getEstimatedETHforLINK(uint256 linkAmount)
+    //Gets the estimated amount of ETH needed to buy the provided linkFee
+    function getEstimatedETHforLINK()
         external
         payable
         restricted
         returns (uint256)
     {
-        address tokenIn = WETH9;
-        address tokenOut = LINKAddress;
-        uint24 fee = uniFee;
-        uint160 sqrtPriceLimitX96 = 0;
-
         return
             ethAmount = quoter.quoteExactOutputSingle(
-                tokenIn,
-                tokenOut,
-                fee,
-                linkAmount,
-                sqrtPriceLimitX96
+                WETH9,
+                LINKAddress,
+                uniFee,
+                linkFee,
+                0
             );
     }
 
     //Swap ETH to LINK through Uniswap
-    function convertEthToExactLINK(uint256 linkAmount)
-        external
-        payable
-        restricted
-    {
+    function convertEthToExactLINK() external payable restricted {
         //Checks that the entered amount of LINK and value of ETH sent is over 0
-        require(linkAmount > 0, "Must pass non 0 LINK amount");
-        require(msg.value > ethAmount, "Must pass non 0 ETH amount");
+        require(
+            msg.value > ethAmount,
+            "Must pass ETH amount greater than ethAmount"
+        );
 
-        uint256 deadline = block.timestamp + 15;
-        address tokenIn = WETH9;
-        address tokenOut = LINKAddress;
-        uint24 fee = uniFee;
-        address recipient = address(this);
-        uint256 amountOut = linkAmount;
-        uint256 amountInMaximum = msg.value;
-        uint160 sqrtPriceLimitX96 = 0;
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
+            .ExactInputSingleParams({
+                tokenIn: WETH9,
+                tokenOut: LINKAddress,
+                fee: uniFee,
+                recipient: address(this),
+                deadline: block.timestamp + 15,
+                amountIn: msg.value,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
 
-        ISwapRouter.ExactOutputSingleParams memory params = ISwapRouter
-            .ExactOutputSingleParams(
-                tokenIn,
-                tokenOut,
-                fee,
-                recipient,
-                deadline,
-                amountOut,
-                amountInMaximum,
-                sqrtPriceLimitX96
-            );
-
-        uniswapRouter.exactOutputSingle{value: msg.value}(params);
+        uniswapRouter.exactInputSingle{value: msg.value}(params);
     }
-
-    //Needed to refund leftover ETH
-    receive() external payable {}
 
     //Takes in 7 chosen numbers and assigns them to the pickedNumbers mapping.
     function chooseNumbers(
@@ -149,21 +136,31 @@ contract Lottery is VRFConsumerBase {
         uint8 _5,
         uint8 _6
     ) public payable {
+        // Require chosen numbers to be under 51
+        require(_0 < 51);
+        require(_1 < 51);
+        require(_2 < 51);
+        require(_3 < 51);
+        require(_4 < 51);
+        require(_5 < 51);
+        require(_6 < 51);
+        // Value in ETH must match costPerLine
         require(msg.value == costPerLine);
-        require(isAddressEntered[msg.sender] == false);
-        isAddressEntered[msg.sender] = true;
+        // Must not already be enetered
+        require(isAddressEntered[drawNumber][msg.sender] == false);
+        isAddressEntered[drawNumber][msg.sender] = true;
         //transfers money to poolOwner
         (bool success, ) = poolOwner.call{value: costPerLine}("");
         require(success, "Transaction failed.");
         totalPrizePool += costPerLine;
         //Assign selected numbers to mapping
-        pickedNumbers[msg.sender][0] = _0;
-        pickedNumbers[msg.sender][1] = _1;
-        pickedNumbers[msg.sender][2] = _2;
-        pickedNumbers[msg.sender][3] = _3;
-        pickedNumbers[msg.sender][4] = _4;
-        pickedNumbers[msg.sender][5] = _5;
-        pickedNumbers[msg.sender][6] = _6;
+        pickedNumbers[drawNumber][msg.sender][0] = _0;
+        pickedNumbers[drawNumber][msg.sender][1] = _1;
+        pickedNumbers[drawNumber][msg.sender][2] = _2;
+        pickedNumbers[drawNumber][msg.sender][3] = _3;
+        pickedNumbers[drawNumber][msg.sender][4] = _4;
+        pickedNumbers[drawNumber][msg.sender][5] = _5;
+        pickedNumbers[drawNumber][msg.sender][6] = _6;
     }
 
     //Calls Chainlink VRF to start a random Number Request
@@ -186,14 +183,29 @@ contract Lottery is VRFConsumerBase {
 
     //Expand the number to 7 numbers under 50 and check for duplicates
     function expand() public restricted {
-         //subtract the estimated ETH Cost for the LINK from the totalPrizePool
-        totalPrizePool -= ethAmount; 
-        for (uint256 x= 0; x < 7; x++) {
-            winningNumbers[x] = (uint256(keccak256(abi.encode(randomResult, x))) % 50) + 1;
+        //subtract the estimated ETH Cost for the LINK from the totalPrizePool
+        totalPrizePool -= ethAmount;
+        for (uint256 x = 0; x < 7; x++) {
+            winningNumbers[drawNumber][x] =
+                (uint256(keccak256(abi.encode(randomResult, x))) % 50) +
+                1;
             //Checks for Duplicates and gets a new number
-             for(uint8 y = 0; y < 7; y++){
-                if (winningNumbers[x] == winningNumbers[y]) {
-                winningNumbers[x] = (uint256(keccak256(abi.encode(randomResult, x))) % 50) + 1;
+            for (uint8 y = 0; y < 7; y++) {
+                if (
+                    winningNumbers[drawNumber][x] ==
+                    winningNumbers[drawNumber][y]
+                ) {
+                    winningNumbers[drawNumber][x] =
+                        (uint256(
+                            keccak256(
+                                abi.encode(
+                                    randomResult,
+                                    x,
+                                    winningNumbers[drawNumber][x]
+                                )
+                            )
+                        ) % 50) +
+                        1;
                 }
             }
         }
@@ -203,99 +215,133 @@ contract Lottery is VRFConsumerBase {
     correctNumbers variable. Also resets the playerWinningNumbers mapping
     back to a status of false. */
     function checkNumbers() public {
-        require(isAddressEntered[msg.sender]);
+        require(isAddressEntered[drawNumber][msg.sender]);
 
         //Loop through each arrayAddress in the array
-        for (uint256 x = 0; x < 7; x++) {
-            for(uint8 y = 0; y < 7; y++){
-                if (pickedNumbers[msg.sender][x] == winningNumbers[y]) {
-                correctNumbers[msg.sender]++;
+        for (uint8 x = 0; x < 7; x++) {
+            for (uint8 y = 0; y < 7; y++) {
+                if (
+                    pickedNumbers[drawNumber][msg.sender][x] ==
+                    winningNumbers[drawNumber][y]
+                ) {
+                    correctNumbers++;
+                    // Needed for testing / same number multiple times
+                    break;
                 }
             }
         }
 
-        //Add 1 to current prize pool if applicable
-        if (correctNumbers[msg.sender] == 7) {
+        //Add to current prize pool if applicable
+        if (correctNumbers == 7) {
             //85% of Prize Pool
             sevenCorrect.push(payable(msg.sender));
-        } else if (correctNumbers[msg.sender] == 6) {
+        } else if (correctNumbers == 6) {
             //4% of Prize Pool
             sixCorrect.push(payable(msg.sender));
-        } else if (correctNumbers[msg.sender] == 5) {
+        } else if (correctNumbers == 5) {
             //5% of Prize Pool this is correct as there are more winners
             fiveCorrect.push(payable(msg.sender));
-        } else if (correctNumbers[msg.sender] == 4) {
+        } else if (correctNumbers == 4) {
             //3% of Prize Pool
             fourCorrect.push(payable(msg.sender));
-        } else if (correctNumbers[msg.sender] == 3) {
+        } else if (correctNumbers == 3) {
             //2% of Prize Pool
             threeCorrect.push(payable(msg.sender));
         }
 
-        //Reset isAddressEntered & correctNumbers
-        isAddressEntered[msg.sender] = false;
-        correctNumbers[msg.sender] = 0;
+        //Reset correctNumbers
+        correctNumbers = 0;
     }
 
-    //Distributes Prize and resets contract
-    function weeklyReset() public payable restricted {
-        //require balance of the current totalPrizePool plus remaining balances from other pools
-        require(msg.value >= (totalPrizePool + sevenPool + sixPool + fivePool + fourPool + threePool));
+    function dividePool() public restricted {
         /* Divides the prize pool into 100 pieces as decimals are not uint in
-        solidity. Then distribute 88 pieces to say sevenPool as 88% of the prize
-        working the same as doing * 0.88 */
-        uint256 dividedPool = (totalPrizePool / 100);
+    solidity. Then distribute 88 pieces to say sevenPool as 88% of the prize
+    working the same as doing * 0.88 */
+        dividedPool = (totalPrizePool / 100);
         //Using += to carry over previous balance is prize not won
         sevenPool += (dividedPool * 85);
         sixPool += (dividedPool * 4);
-        fivePool +=  (dividedPool * 5);
+        fivePool += (dividedPool * 5);
         fourPool += (dividedPool * 3);
         threePool += (dividedPool * 2);
         //Last 1% of dividedPool is used for gas
+    }
 
-        //Create variables for use in for loops
-        uint256 totalSeven = sevenCorrect.length;
-        uint256 totalSix = sixCorrect.length;
-        uint256 totalFive = fiveCorrect.length;
-        uint256 totalFour = fourCorrect.length;
-        uint256 totalThree = threeCorrect.length;
+    function sevenClaimPrize() public payable restricted {
+        // Require someone has 7 numbers correct and value is sevenPool prize money
+        require(sevenCorrect.length > 0);
+        require(msg.value == sevenPool);
 
-        /* If using .length property then the for loop will not complete because
-        after each run the account is deleted from the array and paid as x grows
-        in value to loop through array .length would be shrinking not paying out
-        everyone therefore a static variable is needed */
-        for (uint256 x = 0; x < totalSeven; x++) {
-            uint256 prize = sevenPool / totalSeven;
+        for (uint256 x = 0; x < sevenCorrect.length; x++) {
+            uint256 prize = sevenPool / sevenCorrect.length;
             address payable winner = sevenCorrect[x];
             (bool success, ) = winner.call{value: prize}("");
             require(success, "Transaction failed.");
         }
-        for (uint256 x = 0; x < totalSix; x++) {
-            uint256 prize = sixPool / totalSix;
+        sevenPool = 0;
+    }
+
+    function sixClaimPrize() public payable restricted {
+        // Require someone has 6 numbers correct and value is sevenPool prize money
+        require(sixCorrect.length > 0);
+        require(msg.value == sixPool);
+
+        for (uint256 x = 0; x < sixCorrect.length; x++) {
+            uint256 prize = sixPool / sixCorrect.length;
             address payable winner = sixCorrect[x];
             (bool success, ) = winner.call{value: prize}("");
             require(success, "Transaction failed.");
         }
-        for (uint256 x = 0; x < totalFive; x++) {
-            uint256 prize = fivePool / totalFive;
+        sixPool = 0;
+    }
+
+    function fiveClaimPrize() public payable restricted {
+        // Require someone has 5 numbers correct and value is sevenPool prize money
+        require(fiveCorrect.length > 0);
+        require(msg.value == fivePool);
+
+        for (uint256 x = 0; x < fiveCorrect.length; x++) {
+            uint256 prize = fivePool / fiveCorrect.length;
             address payable winner = fiveCorrect[x];
             (bool success, ) = winner.call{value: prize}("");
             require(success, "Transaction failed.");
         }
-        for (uint256 x = 0; x < totalFour; x++) {
-            uint256 prize = fourPool / totalFour;
+        fivePool = 0;
+    }
+
+    function fourClaimPrize() public payable restricted {
+        // Require someone has 4 numbers correct and value is sevenPool prize money
+        require(fourCorrect.length > 0);
+        require(msg.value == fourPool);
+
+        for (uint256 x = 0; x < fourCorrect.length; x++) {
+            uint256 prize = fourPool / fourCorrect.length;
             address payable winner = fourCorrect[x];
             (bool success, ) = winner.call{value: prize}("");
             require(success, "Transaction failed.");
         }
-        for (uint256 x = 0; x < totalThree; x++) {
-            uint256 prize = threePool / totalThree;
+        fourPool = 0;
+    }
+
+    function threeClaimPrize() public payable restricted {
+        // Require someone has 3 numbers correct and value is sevenPool prize money
+        require(threeCorrect.length > 0);
+        require(msg.value == threePool);
+
+        for (uint256 x = 0; x < threeCorrect.length; x++) {
+            uint256 prize = threePool / threeCorrect.length;
             address payable winner = threeCorrect[x];
             (bool success, ) = winner.call{value: prize}("");
             require(success, "Transaction failed.");
         }
+        threePool = 0;
+    }
+
+    // Resets the winners Arrays and adjusts the new totalPrizePool
+    function weeklyReset() public restricted {
         //Reset variables
-        totalPrizePool = 0;
+        totalPrizePool = threePool + fourPool + fivePool + sixPool + sevenPool;
+        drawNumber++;
         delete sevenCorrect;
         delete sixCorrect;
         delete fiveCorrect;
