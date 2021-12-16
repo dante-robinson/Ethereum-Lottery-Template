@@ -7,16 +7,17 @@ to adjust this contract as you wish as it is open sourced with an MIT License.
 
 ## How it works
 
-1. Contract Deployed > Player chooses numbers
-2. Contract get an estimated amount of ETH needed to
-3. swap for the specified LINK Fee in the constructor
-4. Use estimated fee to convert ETH to LINK
-5. Get a random number from Chainlink Oracle
-6. Expand the random number into 7 numbers
-7. Then players can check there numbers to the 7 winning chosen numbers
-8. Contact will then divide the total prize pool
-9. Run the claim prize function for each prize if someone has won
-10. Reset the variables
+1. Contract Deployed
+2. Player chooses numbers
+3. Contract get an estimated amount of ETH needed to
+4. swap for the specified LINK Fee in the constructor
+5. Use estimated fee to convert ETH to LINK
+6. Get a random number from Chainlink Oracle
+7. Expand the random number into 7 numbers
+8. Then players can check there numbers to the 7 winning chosen numbers
+9. Contact will then divide the total prize pool
+10. Run the claim prize function for each prize if someone has won
+11. Reset the variables
 
 The linkFee needed for each network can be found on Chainlink's website here as well as the VRF
 and keyHash you will need. The LINK Address should be the same.
