@@ -98,7 +98,4 @@ React Front End
 
 ### Donations
 
-<b>Bitcoin</b> - bc1qp5hn4vnexdmu276yphh3xr83xqlsmu3v2vspnw<br>
-<b>Litecoin</b> - ltc1qjxm4t8tryjenlu6g94uvyd30v2drg2pms9mjjv<br>
-<b>Ethereum</b> - 0x31F7F75D12248892202aC9CC32DA5dEFc5B09dC9<br>
-<b>Ethereum Classic</b> - 0x950669B36b7D7028629B8FA6ee43c3C895F06707<br>
+https://cointr.ee/dante_robinson
