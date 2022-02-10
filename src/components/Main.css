@@ -6,7 +6,7 @@
   width: 100vw;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 50px 309px 309px 50px 259px 50px 600px 350px 20px;
+  grid-template-rows: 50px 309px 309px 50px 259px 326px 326px 326px 319px 319px 319px 20px;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -100,29 +100,28 @@
 }
 
 .worksHeader {
-  grid-row-start: 4;
-  grid-row-end: 5;
+  grid-row-start: 7;
+  grid-row-end: 8;
   grid-column-start: 2;
   grid-column-end: 3;
 
   position: relative;
   text-align: center;
-  top: 230px;
 }
 .worksParagraph {
-  grid-row-start: 4;
-  grid-row-end: 5;
+  grid-row-start: 7;
+  grid-row-end: 8;
   grid-column-start: 1;
   grid-column-end: 4;
 
   position: relative;
   text-align: center;
-  top: 300px;
+  top: 100px;
 }
 
 .devHeader {
-  grid-row-start: 5;
-  grid-row-end: 6;
+  grid-row-start: 10;
+  grid-row-end: 11;
   grid-column-start: 1;
   grid-column-end: 2;
 
@@ -130,8 +129,8 @@
   text-align: center;
 }
 .lotteryHeader {
-  grid-row-start: 5;
-  grid-row-end: 6;
+  grid-row-start: 10;
+  grid-row-end: 11;
   grid-column-start: 2;
   grid-column-end: 3;
 
@@ -139,28 +138,34 @@
   text-align: center;
 }
 .contractHeader {
-  grid-row-start: 5;
-  grid-row-end: 6;
+  grid-row-start: 10;
+  grid-row-end: 11;
   grid-column-start: 3;
   grid-column-end: 4;
 
   position: relative;
   text-align: center;
 }
+
 .winnerHeader {
-  grid-row-start: 5;
-  grid-row-end: 6;
-  grid-column-start: 2;
-  grid-column-end: 3;
+  grid-row-start: 10;
+  grid-row-end: 11;
+  grid-column-start: 1;
+  grid-column-end: 4;
 
   position: relative;
   text-align: center;
   top: 125px;
 }
-
+ul {
+  list-style: none;
+}
+li {
+  display: inline;
+}
 .ghFooter {
-  grid-row-start: 6;
-  grid-row-end: 7;
+  grid-row-start: 12;
+  grid-row-end: 13;
   grid-column-start: 3;
   grid-column-end: 4;
 
