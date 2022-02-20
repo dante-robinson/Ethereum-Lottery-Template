@@ -109,7 +109,3 @@ if you need any test ETH for rinkeby checkout the chainlink faucet here - https:
 ## Things not finished
 
 React Front End
-
-### Donations
-
-https://cointr.ee/dante_robinson
