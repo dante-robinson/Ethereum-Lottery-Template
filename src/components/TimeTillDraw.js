@@ -7,29 +7,28 @@ const TimeTillDraw = ({ lottery }) => {
   );
 
   const getTimeTillDraw = () => {
-    let currentDate = new Date(Date.now());
-    console.log(nextDrawTime);
-
-    if (currentDate > nextDrawTime) {
-      let day = nextDrawTime;
-      day = day + 7;
-      setNextDrawTime(nextDrawTime.setUTCDate(day));
-      console.log(nextDrawTime);
-    }
-
-    const difference = nextDrawTime - currentDate;
-
-    let timeLeft = {};
-
-    if (difference > 0) {
-      timeLeft = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    }
-    return setTimeTillDraw(timeLeft);
+    // let currentDate = new Date(Date.now());
+    //
+    // if (currentDate > nextDrawTime) {
+    //   let day = nextDrawTime.getDate();
+    //   day += 7;
+    //   setNextDrawTime(nextDrawTime.setDate(day));
+    //   console.log(nextDrawTime);
+    // }
+    //
+    // let difference = currentDate - nextDrawTime;
+    // console.log(difference);
+    // let timeLeft = {};
+    //
+    // if (difference > 0) {
+    //   timeLeft = {
+    //     days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    //     hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    //     minutes: Math.floor((difference / 1000 / 60) % 60),
+    //     seconds: Math.floor((difference / 1000) % 60),
+    //   };
+    // }
+    // return setTimeTillDraw(timeLeft);
   };
 
   useEffect(() => {

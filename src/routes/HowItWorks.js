@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
+import { useMetaMask } from "metamask-react";
 
 const HowItWorks = () => {
   return (
-    <div className="row-start-7 row-end-8 col-start-1 col-end-4 ">
-      <h3 className="text-4xl font-extrabold">How it works</h3>
-      <p className="worksParagraph row-start-7 row-end-8 col-start-1 col-end-4">
+    <div className=" min-h-screen p-4 grid grid-cols-3 gap-4 grid-rows-works">
+      <Header />
+      <h3 className="text-4xl font-extrabold col-start-2 row-start-3 text-center">
+        How it works
+      </h3>
+      <p className="col-span-3 row-start-4 relative top-12 text-center">
         You the player can enter the lottery by choosing 7 numbers between 1 and
         50 and then will pay for the transaction fee as well as the cost of the
         lottery ticket (0.1 ETH). The money is sent to the designated lottery
@@ -23,6 +29,7 @@ const HowItWorks = () => {
         winners of the previous draw these transactions can be verified by
         checking the lottery address listed below.
       </p>
+      <Footer />
     </div>
   );
 };

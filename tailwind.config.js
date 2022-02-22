@@ -3,7 +3,8 @@ module.exports = {
   theme: {
     extend: {
       gridTemplateRows: {
-        5: "50px 1fr 1fr 1fr 25px",
+        home: "50px 1fr 1fr 1fr 25px",
+        works: "50px 0.65fr 50px 1.35fr 25px",
       },
     },
   },
