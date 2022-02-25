@@ -23,7 +23,6 @@ const WinningNumbers = ({ lottery }) => {
       </li>
     );
   });
-  console.log(returnPastNumbers);
 
   return (
     <div className="row-start-3 col-start-3 self-center text-center">

@@ -7,10 +7,8 @@ import LotteryWallet from "./components/LotteryWallet";
 import Header from "./components/Header";
 import TimeTillDraw from "./components/TimeTillDraw";
 import WinningNumbers from "./components/WinningNumbers";
-import { useMetaMask } from "metamask-react";
 
 const App = (props) => {
-  console.log(props.lottery);
   return (
     <div className="min-h-screen p-4 grid grid-cols-3 gap-4 grid-rows-home">
       <Header />
