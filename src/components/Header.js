@@ -1,7 +1,7 @@
 import React from "react";
 import Metamask from "../metamask.png";
 import { Link } from "react-router-dom";
-import Button from "./wallet/button";
+import Button from "./wallet/Button";
 
 const Header = () => {
   return (

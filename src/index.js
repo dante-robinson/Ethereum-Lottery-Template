@@ -9,7 +9,6 @@ import { Web3ReactProvider } from "@web3-react/core";
 import env from "react-dotenv";
 import HowItWorks from "./routes/HowItWorks";
 import PreviousWinners from "./routes/PreviousWinners";
-import { injected } from "./components/wallet/metamask";
 
 function getLibrary(provider, connector) {
   return new Web3(provider);

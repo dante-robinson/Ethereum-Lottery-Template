@@ -93,11 +93,12 @@ with your API LINK. Then you can run in a seperate terminal window
 
 `truffle test`
 
-If you would like to deploy the project you will need to create a .env file in the root directory and put 2 variables in it with these names
+If you would like to deploy the project you will need to create a .env file in the root directory and put 3 variables in it with these names
 
 ```
 ALCHEMY_API = "JUST YOUR API KEY NOT THE ENTIRE LINK"
 DEPLOYER_KEY = "YOUR PRIVATE KEY"
+ETHERSCAN_API = "ETHERSCAN API KEY"
 ```
 
 then you should be able to run

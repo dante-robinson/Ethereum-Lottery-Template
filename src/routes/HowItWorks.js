@@ -1,7 +1,6 @@
 import React from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { useMetaMask } from "metamask-react";
 
 const HowItWorks = () => {
   return (
