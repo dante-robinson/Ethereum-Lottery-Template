@@ -3,7 +3,7 @@
 This is my first smart contract made in solidity with a react front end. This contract is not 100%
 decentralized and requires an owner address to call a few functions that I will get into. Because of
 this fact I do not plan on pushing this to ETH mainnet and will just be leaving it on testnet. Feel free
-to adjust this contract as you wish as it is open sourced with an MIT License.
+to adjust this contract as you wish as it is open sourced with an LGPL v3 License.
 
 ## How it works
 
