@@ -1,11 +1,18 @@
 # Lottery Contract
 
-This is my first smart contract made in solidity with a react front end. This contract is not 100%
+This is my first smart contract made in solidity with a React front end. This contract is not 100%
 decentralized and requires an owner address to call a few functions that I will get into. Because of
 this fact I do not plan on pushing this to ETH mainnet and will just be leaving it on testnet. Feel free
 to adjust this contract as you wish as it is open sourced with an LGPL v3 License.
 
-## How it works
+[How It Works](#how-it-works) <br />
+[Issues](#issues) <br />
+[Things that can be changed](#changed) <br />
+[How to run](#run) <br />
+[How to build upon](#build) <br />
+[Things not finished](#not-finished) <br />
+
+## How it works <a name="how-it-works"></a>
 
 1. Contract Deployed
 2. Player chooses numbers
@@ -55,7 +62,7 @@ The numbers that are recorded have a drawNumber attached to them meaning, that y
 data to the UI and the data is stored on the blockchain and you won't require any server space to
 store it.
 
-## Issues
+## Issues <a name="issues"></a>
 
 As mentioned at the beginning this contract is not 100% decentralized and has multiple points of
 centralization. This contract in it's current state requires the deployer address to call some functions
@@ -70,7 +77,7 @@ mentioned you would need to send the estimated ETH needed to convert to LINK to 
 the swap so what's stopping the bad actor to just recall that function over and over until it's empty it
 doesn't really change anything so I didn't do that in this contract.
 
-## Things that can be changed
+## Things that can be changed <a name="changed"></a>
 
 I wasn't sure which way could be cheaper across large scale and small scale, currently the way the
 contract is setup is to get a random set of numbers and then have the players call the checkNumbers
@@ -107,6 +114,39 @@ then you should be able to run
 
 if you need any test ETH for rinkeby checkout the chainlink faucet here - https://faucets.chain.link/rinkeby
 
-## Things not finished
+## How to run <a name="run"></a>
+
+I have provided an images folder for those who can't or don't want to run this application on there system directly to see what it looks like on the front end. For those wanting to run this project directly off their machine you will need to download yarn which you can get through npm. Here are links to both of those
+
+<b>npm</b> - https://docs.npmjs.com/cli/v8/configuring-npm/install <br />
+<b>yarn</b> - https://classic.yarnpkg.com/lang/en/docs/install/ <br />
+
+Once you have yarn installed we can continue on. From here we need to load a terminal inside the root directory of the project and run the command
+
+`yarn install`
+
+this will get all the npm packages needed to run our project. After that finishes we can then run
+
+`yarn run start`
+
+which should load a new tab in your browser at localhost:3000 where you can see the website. Some data may be missing because you dont have a .env file created in the root directory. If you would like to see all the data on the webpage you will need to create the .env file in the root directory and you will need to create 2 variables like this
+
+```
+ALCHEMY_API = "xxxxxxx"
+ETHERSCAN_API = "xxxxxxx"
+```
+
+You will need to provide your own Alchemy and Etherscan API Keys which you can get by creating an account at these 2 sites
+
+<b>Etherscan</b> - https://info.etherscan.com/api-keys/ <br />
+<b>Alchemy</b> - https://www.alchemy.com/ <br />
+
+The type of API Key for alchemy we want to create is a Rinkeby Network key the environment doesn't matter you can put staging or development if you would like.
+
+## How to build upon <a name="build"></a>
+
+If you would like to use this baseline for your own crypto lottery smart contract you are more than welcome to do so. You can go to the top of the repo and click the fork button to create your own cloned repository of this contract and then git clone that repo and build it out from there.
+
+## Things not finished <a name="not-finished"></a>
 
 Selectable Buttons on the Account page as well as the confirm button to send the numbers to the Blockchain.
